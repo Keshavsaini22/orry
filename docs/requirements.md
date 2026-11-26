@@ -3,8 +3,8 @@
 ## Autonomous AI Software Engineer
 
 **Document status:** Approved product requirements baseline (architecture choices remain separately documented)\
-**Version:** 2.0\
-**Date:** 2026-11-23\
+**Version:** 2.1\
+**Date:** 2026-11-26\
 **Document purpose:** This document defines the functional and
 non-functional requirements for an autonomous software engineering
 agent. It is intended to be kept in the repository and used as the
@@ -21,7 +21,7 @@ The Autonomous AI Software Engineer (AIASE) is a system that receives a
 software bug or engineering task from Asana, investigates the relevant
 codebase, attempts to reproduce the problem, identifies and validates
 likely root causes, proposes and implements a fix, verifies the changes,
-and opens a pull request for human review.
+and opens a merge request for human review.
 
 If the system cannot confidently determine or implement a safe fix, it
 must not fabricate certainty or make speculative code changes. Instead,
@@ -52,7 +52,7 @@ merely a code-generation chatbot.
 
 The initial release is not intended to:
 
--   Merge pull requests automatically.
+-   Merge merge requests automatically.
 -   Deploy code to production.
 -   Modify production data or infrastructure.
 -   Execute arbitrary commands with unrestricted host access.
@@ -95,7 +95,7 @@ initial scope.
   Verification                        Tests and checks used to evaluate
                                       the proposed change
 
-  PR                                  Pull request opened for human
+  MR                                  merge request opened for human
                                       review
 
   Fallback report                     Research and investigation report
@@ -122,7 +122,7 @@ The initial system is expected to integrate with:
 -   **Asana:** issue discovery, issue details, comments, and
     notifications.
 -   **Git provider:** repository access, branches, commits, pushes, and
-    pull requests. GitHub is the initial target unless configured
+    merge requests. GitLab is the initial target unless configured
     otherwise.
 -   **Execution environment:** isolated workspace or container for
     repository inspection, builds, tests, and controlled reproduction.
@@ -139,7 +139,7 @@ The initial system is expected to integrate with:
 3.  The repository contains enough setup information to install
     dependencies and run at least some checks, or the agent can identify
     what is missing.
-4.  The Git provider supports creating branches and pull requests
+4.  The Git provider supports creating branches and merge requests
     through an authorized integration.
 5.  The agent operates with explicitly configured permissions.
 6.  Secrets are supplied through a secure secret mechanism and are not
@@ -151,7 +151,7 @@ The system should support configuration for:
 
 -   Asana workspace, project, and assignment filters.
 -   Repository and default base branch.
--   Git provider and PR settings.
+-   Git provider and MR settings.
 -   Allowed commands and network access.
 -   Runtime, dependency installation, build, lint, and test commands.
 -   Maximum investigation time, implementation attempts, and retry
@@ -180,7 +180,7 @@ The normal workflow is:
 11. Add or update tests that cover the reported behaviour.
 12. Run relevant tests and quality checks.
 13. Review the diff and verify the acceptance criteria.
-14. If checks pass and policy allows, push the branch and open a PR.
+14. If checks pass and policy allows, push the branch and open a MR.
 15. Post a summary and links to the Asana issue.
 16. Wait for human review; process review feedback if that capability is
     enabled.
@@ -258,7 +258,7 @@ build/test commands where possible.
 configuration, and documentation before proposing a code change.
 
 **FR-012 (P1):** The system should inspect Git history, blame
-information, related commits, and relevant pull requests to identify
+information, related commits, and relevant merge requests to identify
 possible regressions or prior decisions.
 
 **FR-013 (P1):** The system should construct a relevant dependency and
@@ -414,24 +414,24 @@ disclosed.
 **FR-053 (P1):** The system should run security or static-analysis
 checks when configured and relevant.
 
-### 4.9 Pull request creation
+### 4.9 merge request creation
 
 **FR-054 (P0):** The system shall push the work branch only after the
 applicable verification and policy checks.
 
-**FR-055 (P0):** The system shall create a pull request against the
+**FR-055 (P0):** The system shall create a merge request against the
 configured base branch when all required conditions are satisfied.
 
-**FR-056 (P0):** The PR description shall include: - Original issue
+**FR-056 (P0):** The MR description shall include: - Original issue
 link. - Problem summary. - Confirmed root cause, or an explicit
 statement that it remains uncertain. - Solution and implementation
 summary. - Files or components changed. - Tests and checks executed with
 their outcomes. - Known limitations, risks, and checks not performed.
 
-**FR-057 (P0):** The system shall not merge the PR automatically in the
+**FR-057 (P0):** The system shall not merge the MR automatically in the
 initial release.
 
-**FR-058 (P0):** The system shall add the PR link and a concise
+**FR-058 (P0):** The system shall add the MR link and a concise
 execution summary to the originating Asana issue.
 
 **FR-059 (P1):** The system should process human review comments,
@@ -486,7 +486,7 @@ logs, test data, or human decisions needed to continue.
 other configured update on the originating Asana issue and notify the
 relevant developer when permissions allow.
 
-**FR-071 (P0):** The system shall not create a PR containing speculative
+**FR-071 (P0):** The system shall not create a MR containing speculative
 or unverified changes merely to make the run appear successful.
 
 **FR-072 (P0):** The report shall distinguish among: - Confirmed
@@ -529,7 +529,7 @@ debugging and auditing.
 execution cost where provider data is available.
 
 **FR-083 (P0):** The system shall support correlation between an Asana
-issue, agent run, workspace, Git branch, commits, and PR.
+issue, agent run, workspace, Git branch, commits, and MR.
 
 ------------------------------------------------------------------------
 
@@ -571,11 +571,11 @@ Every run shall finish with one of these outcomes:
   -----------------------------------------------------------------------
   Outcome                             Meaning
   ----------------------------------- -----------------------------------
-  `FIXED_PR_CREATED`                  A code change was implemented,
+  `FIXED_MR_CREATED`                  A code change was implemented,
                                       required checks met policy, and a
-                                      PR was created
+                                      MR was created
 
-  `RESEARCH_COMPLETED`                No PR was created; a useful
+  `RESEARCH_COMPLETED`                No MR was created; a useful
                                       investigation/research report was
                                       delivered
 
@@ -717,7 +717,7 @@ The following policies apply throughout the system:
     and command outcomes.
 6.  **No unsupported certainty.** Hypotheses must not be represented as
     confirmed root causes without evidence.
-7.  **No speculative PR.** If the fix is not sufficiently supported or
+7.  **No speculative MR.** If the fix is not sufficiently supported or
     verification requirements are not met, the agent should use fallback
     reporting or human escalation.
 8.  **Bounded autonomy.** All retries, tool usage, execution time, and
@@ -879,7 +879,7 @@ The integration should support, subject to API permissions:
 -   Reading issue details and comments.
 -   Reading accessible attachment metadata and links.
 -   Posting investigation summaries and fallback reports.
--   Posting PR links and completion summaries.
+-   Posting MR links and completion summaries.
 -   Notifying or mentioning the relevant developer where supported.
 
 Webhook handling must be idempotent. Polling should be available as a
@@ -894,8 +894,8 @@ The integration should support:
 -   Branch creation.
 -   Commit creation.
 -   Branch push.
--   Pull request creation.
--   Pull request metadata retrieval.
+-   merge request creation.
+-   merge request metadata retrieval.
 -   Review-comment retrieval for a later feedback iteration.
 
 ### 10.3 Execution environment
@@ -943,9 +943,9 @@ acceptance criteria, and a repository with a reproducible defect:
 7.  It adds or updates tests.
 8.  It runs configured checks and reports their actual outcomes.
 9.  It inspects the final diff.
-10. If policy conditions pass, it pushes the branch and opens a PR.
-11. It posts a summary and PR link to the Asana issue.
-12. It does not merge the PR.
+10. If policy conditions pass, it pushes the branch and opens a MR.
+11. It posts a summary and MR link to the Asana issue.
+12. It does not merge the MR.
 
 ### AC-002: Root cause remains uncertain
 
@@ -957,7 +957,7 @@ Given an issue that the agent cannot confidently diagnose:
 4.  It proposes possible solutions with trade-offs and validation steps.
 5.  It identifies missing information and recommended next actions.
 6.  It publishes the fallback report to Asana.
-7.  It does not create a speculative PR.
+7.  It does not create a speculative MR.
 
 ### AC-003: Bug cannot be reproduced
 
@@ -979,7 +979,7 @@ Given a code change that fails required tests:
 3.  It does not report verification as successful.
 4.  If it cannot resolve the failure within limits, it stops and
     publishes a report or requests human intervention.
-5.  It does not open a PR that falsely claims all required checks
+5.  It does not open a MR that falsely claims all required checks
     passed.
 
 ### AC-005: Human approval required
@@ -1051,12 +1051,12 @@ clearly report why it could not reproduce it.
 **Exit criterion:** The agent can implement a focused fix for a
 supported root cause and preserve a reviewable diff.
 
-### Milestone 4 --- Verification and PR
+### Milestone 4 --- Verification and MR
 
 -   Test/lint/type/build execution.
 -   Self-review.
 -   Git push.
--   PR creation.
+-   MR creation.
 -   Asana update.
 
 **Exit criterion:** A verified change can be submitted for human review
@@ -1078,58 +1078,11 @@ before the system is considered a complete MVP.
 
 ------------------------------------------------------------------------
 
-## 13. Open product and technical decisions
+## 13. Architecture baseline and open decisions
 
-The following decisions are intentionally left open. The implementation
-agent must not silently assume that these choices have already been
-finalized.
+The companion `architecture.md` v1.0 defines the selected architecture: Express/TypeScript with Prisma, Python with LangGraph/LangChain, PostgreSQL, RabbitMQ, durable scheduling, Docker and Playwright. GitLab is the initial repository provider. Asana remains the issue provider. The architecture document governs technical choices; this SRS governs product behavior.
 
-  -----------------------------------------------------------------------
-  Decision                            Initial direction / question
-  ----------------------------------- -----------------------------------
-  Workflow framework                  Evaluate LangGraph or an equivalent
-                                      stateful orchestration approach
-
-  Backend language                    To be selected
-
-  API framework                       To be selected
-
-  Persistence database                To be selected
-
-  Queue/event mechanism               To be selected based on deployment
-                                      and reliability needs
-
-  Initial Git provider                GitHub is the proposed first
-                                      integration
-
-  Asana event handling                Webhooks preferred, polling
-                                      fallback
-
-  Execution isolation                 Container or sandbox; select based
-                                      on security requirements
-
-  LLM provider                        Keep provider abstraction where
-                                      practical
-
-  Research access                     Define approved search and
-                                      documentation sources
-
-  Frontend/dashboard                  Not required for the first vertical
-                                      slice; run history may initially be
-                                      available through logs/API
-
-  Deployment model                    To be selected
-
-  Multi-repository support            Start with one configured
-                                      repository; design interfaces to
-                                      allow expansion
-
-  Human approval UX                   Asana comment, dashboard, or
-                                      another explicit approval channel
-                                      to be selected
-  -----------------------------------------------------------------------
-
-------------------------------------------------------------------------
+Open decisions: exact LLM models, approved research sources, deployment sizing, retention periods, approval UI beyond the initial authenticated API, and production sandbox hardening. Multiple explicitly registered repositories are supported; the first vertical slice may use one.
 
 ## 14. Instructions for AI coding agents working in this repository
 
@@ -1177,7 +1130,7 @@ presenting that assessment.
 
 ---
 
-## 15. Finalized product decisions (v2.0)
+## 15. Finalized product decisions (v2.1)
 
 This section supersedes any conflicting earlier suggestions. Existing FR-001–FR-083 and NFR-001–NFR-024 remain applicable. New requirements extend rather than replace the earlier SRS.
 
@@ -1185,7 +1138,7 @@ This section supersedes any conflicting earlier suggestions. Existing FR-001–F
 
 - The first release supports **one developer** and one connected Asana identity, with multiple explicitly configured repositories permitted.
 - Architecture must preserve replaceable provider interfaces and per-run isolation for future multi-user support, but no multi-tenant UI, billing, or tenant administration is required in v1.
-- Asana is the input and status/reporting surface; GitHub is the initial code-review output; a separate dashboard is optional.
+- Asana is the input and status/reporting surface; GitLab is the initial code-review output; a separate dashboard is optional.
 - The agent must support backend, frontend/UI, and cross-stack bugs. No guarantee of fully autonomous resolution is implied.
 
 ### 15.2 Issue metadata and repository selection
@@ -1216,8 +1169,8 @@ Dedicated test accounts, seeded synthetic data, short-lived credentials and secr
 
 - Pin each investigation to a specific **base commit SHA**; record repository URL, branch and SHA before executing tests.
 - Do **not** automatically pull changing upstream code during an active reproduction/implementation cycle.
-- Before publishing a PR, fetch latest base, detect divergence, determine whether upstream already fixed the bug, then perform a controlled rebase or equivalent integration if necessary; rerun affected reproduction and regression checks against the updated base.
-- If upstream changes make a fix redundant, stop implementation and report the finding rather than creating an unnecessary PR.
+- Before publishing a MR, fetch latest base, detect divergence, determine whether upstream already fixed the bug, then perform a controlled rebase or equivalent integration if necessary; rerun affected reproduction and regression checks against the updated base.
+- If upstream changes make a fix redundant, stop implementation and report the finding rather than creating an unnecessary MR.
 - Reassignment of an Asana issue **does not automatically cancel** a run. Continue to a useful result while permissions remain valid and no explicit cancellation has occurred; revalidate authorization before any write or publication. If permissions are revoked, preserve allowed artifacts and stop restricted actions.
 
 ### 15.5 Production-only incidents
@@ -1234,14 +1187,14 @@ Use a risk-based verification policy:
 4. Select specialized tests by bug type: concurrency/load, transaction consistency, message retry/idempotency, UI interaction/visual/responsive, accessibility, or network fault injection.
 5. Inspect the final diff for scope, regressions, data/security risks, and acceptance-criteria coverage.
 6. Record actual command outputs, status and environment; classify skipped/blocked checks explicitly.
-7. Open a normal PR only if the configured mandatory checks and evidence gates pass. If reproduction cannot be established, **a draft PR requires explicit human approval** and must disclose all unverified claims. Otherwise use the fallback report.
+7. Open a normal MR only if the configured mandatory checks and evidence gates pass. If reproduction cannot be established, **a draft MR requires explicit human approval** and must disclose all unverified claims. Otherwise use the fallback report.
 8. Never merge automatically.
 
 ### 15.7 Asana input and output contract
 
 Use Asana OAuth or another explicitly authorized supported connection method. Webhooks are the preferred event source; periodic reconciliation polling catches missed events. Verify webhook authenticity according to the provider's handshake/signature mechanism, fetch the latest task state, confirm the configured user is the assignee at ingestion, and apply eligibility/idempotency checks. Avoid launching on arbitrary comments or edits. Store credentials encrypted and do not log tokens.
 
-The orchestrator shall persist a **typed, versioned run result**. Asana updates and GitHub PR descriptions must be rendered from this result rather than separately invented by specialists. Result states include `FIXED_PR_CREATED`, `RESEARCH_COMPLETED`, `NEEDS_HUMAN_INPUT`, `BLOCKED`, `CANCELLED`, and `FAILED`. Status updates should summarize observable milestones without revealing private reasoning or secrets.
+The orchestrator shall persist a **typed, versioned run result**. Asana updates and GitLab MR descriptions must be rendered from this result rather than separately invented by specialists. Result states include `FIXED_MR_CREATED`, `RESEARCH_COMPLETED`, `NEEDS_HUMAN_INPUT`, `BLOCKED`, `CANCELLED`, and `FAILED`. Status updates should summarize observable milestones without revealing private reasoning or secrets.
 
 Suggested result envelope (illustrative; implementation may use equivalent schema):
 
@@ -1257,7 +1210,7 @@ Suggested result envelope (illustrative; implementation may use equivalent schem
   "hypotheses": [],
   "implementation": null,
   "verification": {"status": "NOT_RUN", "checks": []},
-  "pull_request": null,
+  "merge_request": null,
   "research_report": {"findings": [], "sources": [], "possible_solutions": [], "next_steps": []},
   "human_action_required": false,
   "artifacts": []
@@ -1284,7 +1237,7 @@ The agent shall support browser-driven reproduction for frontend defects, includ
 
 **FR-087 (P0):** Pin and persist the investigation base commit SHA and isolate the working tree; do not silently update it mid-investigation.
 
-**FR-088 (P0):** Before PR creation, check upstream divergence, perform a controlled update when needed, and rerun relevant verification.
+**FR-088 (P0):** Before MR creation, check upstream divergence, perform a controlled update when needed, and rerun relevant verification.
 
 **FR-089 (P0):** Continue after issue reassignment only while authorized; recheck permissions before write operations and support explicit cancellation.
 
@@ -1304,17 +1257,17 @@ The agent shall support browser-driven reproduction for frontend defects, includ
 
 **FR-097 (P1):** Support cross-browser, mobile viewport, and accessibility checks according to issue scope and available runners.
 
-**FR-098 (P0):** Save sanitized screenshots, traces, relevant console/network excerpts and test outcomes as investigation artifacts, linked from final report or PR.
+**FR-098 (P0):** Save sanitized screenshots, traces, relevant console/network excerpts and test outcomes as investigation artifacts, linked from final report or MR.
 
 **FR-099 (P0):** For production-only UI bugs, use approved observational evidence and sandbox simulations; never run unauthorized disruptive production browser experiments.
 
 **FR-100 (P0):** Use dedicated test accounts and synthetic/seeded data; prevent test actions from sending real notifications, payments or external side effects unless explicitly permitted.
 
-**FR-101 (P0):** Enforce the risk-based verification and PR publication policy in Section 15.6.
+**FR-101 (P0):** Enforce the risk-based verification and MR publication policy in Section 15.6.
 
 **FR-102 (P0):** Persist and publish the standardized versioned output contract for all outcomes, with evidence links and clear verification status.
 
-**FR-103 (P0):** Allow a human-approved draft PR when reproduction remains unavailable but evidence supports a candidate change; otherwise provide research or escalation rather than falsely claiming a verified fix.
+**FR-103 (P0):** Allow a human-approved draft MR when reproduction remains unavailable but evidence supports a candidate change; otherwise provide research or escalation rather than falsely claiming a verified fix.
 
 ### 16.3 Browser investigation example
 
@@ -1332,7 +1285,7 @@ For a booking form issue where selecting check-out unexpectedly changes check-in
 
 ### 16.4 UI-specific acceptance tests
 
-**AC-008:** Given a deterministic broken UI interaction, the agent can navigate, reproduce the failure, capture evidence, add a failing Playwright test, fix it, rerun the same test successfully, and create a reviewable PR after required checks.
+**AC-008:** Given a deterministic broken UI interaction, the agent can navigate, reproduce the failure, capture evidence, add a failing Playwright test, fix it, rerun the same test successfully, and create a reviewable MR after required checks.
 
 **AC-009:** Given a visual layout bug with an expected screenshot, the agent records viewport/environment, captures actual screenshot, explains differences, applies a targeted fix, and verifies the corrected layout without claiming pixel-perfect equivalence where rendering differs.
 
@@ -1346,15 +1299,15 @@ For a booking form issue where selecting check-out unexpectedly changes check-in
 
 **AC-012 — Reassignment:** An issue reassigned mid-run does not automatically terminate; the run rechecks authorization before writes, and stops restricted operations if access is revoked.
 
-**AC-013 — Moving base branch:** A new upstream commit does not silently change the pinned reproduction environment. Before PR, divergence is detected and verification is repeated after controlled integration, or the run reports that the bug was already resolved upstream.
+**AC-013 — Moving base branch:** A new upstream commit does not silently change the pinned reproduction environment. Before MR, divergence is detected and verification is repeated after controlled integration, or the run reports that the bug was already resolved upstream.
 
 **AC-014 — Ambiguous repository:** An issue with conflicting repository metadata is paused for clarification rather than executed against an arbitrary repository.
 
 **AC-015 — Production-only failure:** The agent uses sanitized observational evidence and synthetic sandbox reproduction; if not reproduced, it produces a report clearly separating facts, hypotheses and proposed tests.
 
-**AC-016 — Verification honesty:** A passing test written after the fix, without a demonstrated pre-fix failure, is not represented as red–green evidence. Required skipped or blocked checks are disclosed; PR policy is enforced.
+**AC-016 — Verification honesty:** A passing test written after the fix, without a demonstrated pre-fix failure, is not represented as red–green evidence. Required skipped or blocked checks are disclosed; MR policy is enforced.
 
-**AC-017 — Output consistency:** All terminal outcomes produce a versioned run result; Asana summaries and PR descriptions derive from that result, including links to available artifacts.
+**AC-017 — Output consistency:** All terminal outcomes produce a versioned run result; Asana summaries and MR descriptions derive from that result, including links to available artifacts.
 
 ---
 
@@ -1369,6 +1322,23 @@ This document is the **final product-requirements baseline for starting architec
 - Operational SLOs, retention/redaction policy for logs/screenshots, backup/recovery, incident response and approval audit trail.
 - Runtime compatibility and supported repository languages/frameworks; document unsupported environments.
 
-**Architecture decisions still open (to resolve in the next phase):** orchestration library, application/backend framework, database, job queue, exact sandbox runtime and hosting, provider adapters, secrets manager, browser topology, observability stack, artifact storage and retention durations. Do not treat these as missing product requirements or silently select them without an architecture decision record.
+**Architecture baseline:** See `architecture.md` v1.0 for finalized HLD choices and remaining validation decisions. Exact hosting, production isolation, secret-store selection, model selection, sizing and retention require validation before production rollout.
 
-**Implementation instruction:** Build and benchmark a local Bug Investigation Engine (including browser reproduction) before adding broad platform infrastructure. Preserve the original FR-001–FR-083, NFR-001–NFR-024 and AC-001–AC-007, and implement the additional v2.0 requirements in Sections 15–17.
+**Implementation instruction:** Build and benchmark a local Bug Investigation Engine (including browser reproduction) before adding broad platform infrastructure. Preserve the original FR-001–FR-083, NFR-001–NFR-024 and AC-001–AC-007, and implement the additional v2.1 requirements in Sections 15–17.
+
+
+## 19. GitLab integration requirements (v2.1)
+
+**FR-104 (P0):** Support configured GitLab project identifiers, instance base URLs and target branches; validate authorization before clone, push and merge request creation.
+
+**FR-105 (P0):** Publish changes through the trusted repository integration, using a deterministic run-specific source branch. Reconcile existing branches and merge requests before retrying ambiguous external writes. Never automatically merge or deploy.
+
+**FR-106 (P0):** Track GitLab pipeline status for the published commit, distinguish local verification from remote CI status, and report pending, failed, skipped or unavailable CI honestly.
+
+**FR-107 (P0):** Keep repository-provider interfaces independent of GitLab-specific identifiers and API response shapes. GitLab is the only required initial implementation.
+
+**AC-018:** Given a verified fix for a configured GitLab project, create exactly one logical MR for the run, link it to Asana and report the corresponding pipeline status. A retry after an ambiguous API response reconciles existing remote state rather than blindly creating another MR.
+
+**AC-019:** Given revoked access, a protected target branch, or an unapproved GitLab host, the publisher must not bypass restrictions; it records the blocked operation and preserves authorized evidence.
+
+**AC-020:** Given a failed or pending GitLab pipeline after local verification, the system reports the actual CI status and never merges or claims remote verification passed.
